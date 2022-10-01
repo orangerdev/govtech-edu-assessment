@@ -3,7 +3,7 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import { useRef, useEffect, useState } from "react"
 import { FilterOutlined } from "@ant-design/icons"
-import AppContext from "@context/AppContext"
+import AppContext from "../context/AppContext"
 import GridCard from "@components/GridCard"
 import SkeletonCard from "@components/SkeletonCard"
 import { isMobile } from "react-device-detect"
@@ -26,7 +26,8 @@ const Home: NextPage = () => {
   const [pokemons, setPokemons] = useState<PokemonCardInterface[]>([])
   const [showLoading, setShowLoading] = useState<boolean>(false)
   const [showSidebar, setShowSidebar] = useState<boolean>(false)
-  const [showFooter, setShowFooter] = useState<boolean>(true)
+  const [showFooter, setShowFooter] = useState<boolean>(false)
+  const [showCompare, setShowCompare] = useState<boolean>(false)
   const [typeFilter, setTypeFilter] = useState<string[]>([])
   const [generationFilter, setGenerationFilter] = useState<string[]>([])
   const [comparePokemons, setComparePokemons] = useState<
@@ -95,6 +96,24 @@ const Home: NextPage = () => {
     }
   }, [showLoading])
 
+  useEffect(() => {
+    if (typeFilter.length > 0) {
+      setShowFooter(true)
+    }
+  }, [typeFilter])
+
+  useEffect(() => {
+    if (generationFilter.length > 0) {
+      setShowFooter(true)
+    }
+  }, [generationFilter])
+
+  useEffect(() => {
+    if (comparePokemons.length > 0) {
+      setShowFooter(true)
+    }
+  }, [comparePokemons])
+
   return (
     <AppContext.Provider
       value={{
@@ -109,6 +128,8 @@ const Home: NextPage = () => {
 
         generationFilter,
         setGenerationFilter,
+
+        showCompare,
 
         doFilterPokemon: () => {
           setPokemons([])
