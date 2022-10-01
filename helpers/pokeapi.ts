@@ -1,6 +1,6 @@
 import axios from "axios"
 import { ResponseInterface } from "interfaces/general"
-import { PokemonCardInterface } from "interfaces/pokemon"
+import { PokemonCardInterface, PokemonTypeInterface } from "interfaces/pokemon"
 
 export const getPokemonsList = async (data: {
   limit: number
@@ -53,6 +53,37 @@ export const getPokemonsList = async (data: {
         success: true,
         data: pokemonCards,
         message: "Pokemons list fetched successfully",
+      }
+    })
+    .catch((error) => {
+      return {
+        success: false,
+        data: null,
+        message: error,
+      }
+    })
+}
+
+export const getPokemontTypesList = async (): Promise<ResponseInterface> => {
+  const graphql = JSON.stringify({
+    query: `query getPokemons {
+      pokemon_v2_type {
+        id
+        name
+      }
+    }`,
+  })
+
+  return await axios({
+    method: "post",
+    url: "https://beta.pokeapi.co/graphql/v1beta",
+    data: graphql,
+  })
+    .then((response) => {
+      return {
+        success: true,
+        data: response.data.data.pokemon_v2_type,
+        message: "Pokemon types list fetched successfully",
       }
     })
     .catch((error) => {

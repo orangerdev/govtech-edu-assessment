@@ -19,7 +19,8 @@
       "@styles/*": ["styles/*"],
       "@components/*": ["components/*"],
       "@helpers/*": ["helpers/*"],
-      "@actions/*": ["actions/*"]
+      "@actions/*": ["actions/*"],
+      "@context/*": ["context/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,6 +1,7 @@
 import type { NextPage } from "next"
 import dynamic from "next/dynamic"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState, useContext } from "react"
+import AppContext from "@context/AppContext"
 import GridCard from "@components/GridCard"
 import SkeletonCard from "@components/SkeletonCard"
 import { isMobile } from "react-device-detect"
@@ -17,8 +18,11 @@ const Home: NextPage = () => {
   const preLoadSkeletonLimit = [...Array(isMobile ? 1 : 4)]
 
   const [offset, setOffset] = useState<number>(0)
-  const [pokemons, setPokemons] = useState<any>([])
+  const [pokemons, setPokemons] = useState<PokemonCardInterface[]>([])
   const [showLoading, setShowLoading] = useState<boolean>(false)
+  const [comparePokemons, setComparePokemons] = useState<
+    PokemonCardInterface[]
+  >([])
 
   const loadNextPokemons = () => {
     getPokemonsList({ limit, offset })
@@ -60,29 +64,36 @@ const Home: NextPage = () => {
   }, [showLoading])
 
   return (
-    <main>
-      <section
-        id="pokemons-list"
-        className="p-8 sm:p-0 sm:w-[960px] grid grid-cols-1 sm:grid-cols-4 gap-4 mx-auto min-h-screen"
-      >
-        {pokemons.length > 0 &&
-          pokemons.map((pokemon: PokemonCardInterface, index: number) => (
-            <GridCard {...pokemon} key={`pokemon-${pokemon.id}`} />
-          ))}
+    <AppContext.Provider
+      value={{
+        comparePokemons,
+        setComparePokemons,
+      }}
+    >
+      <main>
+        <section
+          id="pokemons-list"
+          className="p-8 sm:p-0 sm:w-[960px] grid grid-cols-1 sm:grid-cols-4 gap-4 mx-auto min-h-screen"
+        >
+          {pokemons.length > 0 &&
+            pokemons.map((pokemon: PokemonCardInterface, index: number) => (
+              <GridCard {...pokemon} key={`pokemon-${pokemon.id}`} />
+            ))}
 
-        {pokemons.length === 0 &&
-          firstSkeletonLimit.map((_: any, index: number) => (
-            <SkeletonCard key={`skeleton-${index}`} />
-          ))}
+          {pokemons.length === 0 &&
+            firstSkeletonLimit.map((_: any, index: number) => (
+              <SkeletonCard key={`skeleton-${index}`} />
+            ))}
 
-        {showLoading &&
-          preLoadSkeletonLimit.map((_: any, index: number) => (
-            <SkeletonCard key={`skeleton-${index}`} />
-          ))}
-      </section>
-      <footer ref={endRef}>End here</footer>
-      <Sidebar />
-    </main>
+          {showLoading &&
+            preLoadSkeletonLimit.map((_: any, index: number) => (
+              <SkeletonCard key={`skeleton-${index}`} />
+            ))}
+        </section>
+        <footer ref={endRef}>End here</footer>
+        <Sidebar />
+      </main>
+    </AppContext.Provider>
   )
 }
 
