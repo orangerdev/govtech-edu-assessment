@@ -1,11 +1,29 @@
 import axios from "axios"
+import { setupCache } from "axios-cache-adapter"
 import { ResponseInterface } from "interfaces/general"
-import { PokemonCardInterface, PokemonTypeInterface } from "interfaces/pokemon"
+import {
+  PokemonCardInterface,
+  PokemonListResponseInterface,
+} from "interfaces/pokemon"
+import { getFromStorage, setToStorage } from "@helpers/localStorage"
 
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000,
+})
+
+const api = axios.create({
+  adapter: cache.adapter,
+})
+
+/**
+ * Fetches pokemons list from PokeAPI
+ * @param data
+ * @returns
+ */
 export const getPokemonsList = async (data: {
   limit: number
   offset: number
-}): Promise<ResponseInterface> => {
+}): Promise<PokemonListResponseInterface> => {
   const { limit, offset } = data
 
   const graphql = JSON.stringify({
@@ -35,7 +53,7 @@ export const getPokemonsList = async (data: {
     }`,
   })
 
-  return await axios({
+  return await api({
     method: "post",
     url: "https://beta.pokeapi.co/graphql/v1beta",
     data: graphql,
@@ -53,6 +71,7 @@ export const getPokemonsList = async (data: {
         success: true,
         data: pokemonCards,
         message: "Pokemons list fetched successfully",
+        aggregate: Number(response.data.data.species_aggregate.aggregate.count),
       }
     })
     .catch((error) => {
@@ -60,11 +79,20 @@ export const getPokemonsList = async (data: {
         success: false,
         data: null,
         message: error,
+        aggregate: 0,
       }
     })
 }
 
-export const getPokemontTypesList = async (): Promise<ResponseInterface> => {
+/**
+ * Fetches pokemon types list from PokeAPI
+ * @returns
+ */
+export const getPokemonTypesList = async (): Promise<ResponseInterface> => {
+  // Check from localStorage first
+  if (getFromStorage("pokemonTypes"))
+    return JSON.parse(getFromStorage("pokemonTypes"))
+
   const graphql = JSON.stringify({
     query: `query getPokemons {
       pokemon_v2_type {
@@ -74,17 +102,21 @@ export const getPokemontTypesList = async (): Promise<ResponseInterface> => {
     }`,
   })
 
-  return await axios({
+  return await api({
     method: "post",
     url: "https://beta.pokeapi.co/graphql/v1beta",
     data: graphql,
   })
     .then((response) => {
-      return {
+      const returnResponse = {
         success: true,
         data: response.data.data.pokemon_v2_type,
         message: "Pokemon types list fetched successfully",
       }
+      // Set to localStorage for future use
+      setToStorage("pokemonTypes", JSON.stringify(returnResponse))
+
+      return returnResponse
     })
     .catch((error) => {
       return {
@@ -94,3 +126,48 @@ export const getPokemontTypesList = async (): Promise<ResponseInterface> => {
       }
     })
 }
+
+/**
+ * Fetches pokemon generations list from PokeAPI
+ * @returns
+ */
+export const getPokemonGenerationsList =
+  async (): Promise<ResponseInterface> => {
+    // Check from localStorage first
+    if (getFromStorage("pokemonGenerations"))
+      return JSON.parse(getFromStorage("pokemonGenerations"))
+
+    const graphql = JSON.stringify({
+      query: `query getPokemons {
+      pokemon_v2_generation {
+        id
+        name
+      }
+    }`,
+    })
+
+    return await api({
+      method: "post",
+      url: "https://beta.pokeapi.co/graphql/v1beta",
+      data: graphql,
+    })
+      .then((response) => {
+        const returnResponse = {
+          success: true,
+          data: response.data.data.pokemon_v2_generation,
+          message: "Pokemon generations list fetched successfully",
+        }
+
+        // Set to localStorage for future use
+        setToStorage("pokemonGenerations", JSON.stringify(returnResponse))
+
+        return returnResponse
+      })
+      .catch((error) => {
+        return {
+          success: false,
+          data: null,
+          message: error,
+        }
+      })
+  }

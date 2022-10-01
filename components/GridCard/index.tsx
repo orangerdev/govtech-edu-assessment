@@ -16,6 +16,7 @@ const GridCard: FunctionComponent<PokemonCardInterface> = (props) => {
             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`}
             width={140}
             height={140}
+            alt={name}
           />
         </figure>
         <div className="">

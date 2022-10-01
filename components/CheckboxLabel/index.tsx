@@ -3,7 +3,7 @@ import { CheckboxLabelInterface } from "interfaces/general"
 import { Checkbox } from "antd"
 
 const CheckboxLabel: FunctionComponent<CheckboxLabelInterface> = (props) => {
-  const { id, name, value, onChange } = props
+  const { name, value, onChange } = props
 
   return (
     <>
