@@ -20,7 +20,8 @@
       "@components/*": ["components/*"],
       "@helpers/*": ["helpers/*"],
       "@actions/*": ["actions/*"],
-      "@context/*": ["context/*"]
+      "@context/*": ["context/*"],
+      "@query/*": ["query/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

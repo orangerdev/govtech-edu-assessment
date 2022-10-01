@@ -13,6 +13,10 @@ const Sidebar: FunctionComponent = () => {
   const context: any = useContext(AppContext)
   const [typeList, setTypeList] = useState<any>()
   const [generationList, setGenerationList] = useState<any>()
+  const [typeFilter, setTypeFilter] = useState<CheckboxValueType[]>([])
+  const [generationFilter, setGenerationFilter] = useState<CheckboxValueType[]>(
+    []
+  )
 
   useEffect(() => {
     Promise.all([
@@ -60,7 +64,7 @@ const Sidebar: FunctionComponent = () => {
           <Checkbox.Group
             options={typeList}
             onChange={(checkedValues: CheckboxValueType[]) => {
-              context.setTypeFilter(checkedValues)
+              setTypeFilter(checkedValues)
             }}
           ></Checkbox.Group>
         </div>
@@ -69,16 +73,18 @@ const Sidebar: FunctionComponent = () => {
           <Checkbox.Group
             options={generationList}
             onChange={(checkedValues: CheckboxValueType[]) => {
-              context.setGenerationFilter(checkedValues)
+              setGenerationFilter(checkedValues)
             }}
           ></Checkbox.Group>
         </div>
       </div>
       <Button
         onClick={() => {
-          console.log(context.typeFilter, context.generationFilter)
+          context.setTypeFilter(typeFilter)
+          context.setGenerationFilter(generationFilter)
+          context.doFilterPokemon()
         }}
-        className="w-full"
+        className="w-full rounded-lg"
       >
         Search
       </Button>

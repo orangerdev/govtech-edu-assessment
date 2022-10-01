@@ -29,12 +29,23 @@ const Home: NextPage = () => {
   const [comparePokemons, setComparePokemons] = useState<
     PokemonCardInterface[]
   >([])
+  const [stopObserver, setStopObserver] = useState<boolean>(false)
 
   /**
    * Load next pokemons routine
    */
   const loadNextPokemons = () => {
-    getPokemonsList({ limit, offset })
+    if (stopObserver === true) {
+      setShowLoading(false)
+      return
+    }
+
+    getPokemonsList({
+      limit,
+      offset,
+      type: typeFilter,
+      generation: generationFilter,
+    })
       .then((response) => {
         if (response.success === true) {
           setPokemons((prevData: any) => {
@@ -44,6 +55,10 @@ const Home: NextPage = () => {
             return prevData + limit
           })
           setTotalPokemons(response.aggregate)
+
+          if (response.data.length < limit) {
+            setStopObserver(true)
+          }
         }
       })
       .then(() => {
@@ -59,7 +74,7 @@ const Home: NextPage = () => {
 
     observer = new IntersectionObserver((entries) => {
       const entry = entries[0]
-      if (entry.isIntersecting) {
+      if (entry.isIntersecting && stopObserver === false) {
         setShowLoading(true)
       }
     })
@@ -91,6 +106,14 @@ const Home: NextPage = () => {
 
         generationFilter,
         setGenerationFilter,
+
+        doFilterPokemon: () => {
+          setPokemons([])
+          setTotalPokemons(0)
+          setShowLoading(true)
+          setOffset(0)
+          setStopObserver(false)
+        },
       }}
     >
       <main className="sm:w-[960px] p-4 sm:p-0 sm:py-4 mx-auto">
