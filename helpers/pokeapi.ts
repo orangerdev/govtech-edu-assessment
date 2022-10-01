@@ -49,9 +49,6 @@ export const getPokemonsList = async (data: {
             types: species.pokemons[0].types.map((type: any) => type.type.name),
           }
         })
-
-      console.log(pokemonCards)
-
       return {
         success: true,
         data: pokemonCards,
