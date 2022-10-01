@@ -83,6 +83,7 @@ const Sidebar: FunctionComponent = () => {
           context.setTypeFilter(typeFilter)
           context.setGenerationFilter(generationFilter)
           context.doFilterPokemon()
+          context.setShowSidebar(false)
         }}
         className="w-full rounded-lg"
       >
