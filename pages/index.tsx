@@ -12,10 +12,12 @@ import { PokemonCardInterface } from "interfaces/pokemon"
 
 const Sidebar = dynamic(() => import("@components/Sidebar"), { ssr: false })
 
+const Footer = dynamic(() => import("@components/Footer"), { ssr: false })
+
 const Home: NextPage = () => {
   let observer: any
   const endRef = useRef<any>(null)
-  const limit = 20
+  const limit = 60
   const firstSkeletonLimit = [...Array(limit)]
   const preLoadSkeletonLimit = [...Array(isMobile ? 1 : 4)]
 
@@ -24,6 +26,7 @@ const Home: NextPage = () => {
   const [pokemons, setPokemons] = useState<PokemonCardInterface[]>([])
   const [showLoading, setShowLoading] = useState<boolean>(false)
   const [showSidebar, setShowSidebar] = useState<boolean>(false)
+  const [showFooter, setShowFooter] = useState<boolean>(true)
   const [typeFilter, setTypeFilter] = useState<string[]>([])
   const [generationFilter, setGenerationFilter] = useState<string[]>([])
   const [comparePokemons, setComparePokemons] = useState<
@@ -116,7 +119,7 @@ const Home: NextPage = () => {
         },
       }}
     >
-      <main className="sm:w-[960px] p-4 sm:p-0 sm:py-4 mx-auto">
+      <main className="sm:w-[960px] p-4 sm:p-0 sm:py-4 mx-auto pb-12 sm:pb-12">
         <header>
           <figure className="text-center mb-4">
             <Image
@@ -156,9 +159,10 @@ const Home: NextPage = () => {
               <SkeletonCard key={`skeleton-${index}`} />
             ))}
         </section>
-        <footer ref={endRef}>End here</footer>
-        <Sidebar />
+        <footer ref={endRef}></footer>
       </main>
+      <Sidebar />
+      {showFooter && <Footer />}
     </AppContext.Provider>
   )
 }

@@ -2,6 +2,7 @@ import { FunctionComponent } from "react"
 import { PokemonCardInterface } from "interfaces/pokemon"
 import Image from "next/image"
 import Link from "next/link"
+import TypeLabel from "@components/Type"
 import { Wrapper } from "./index.style"
 
 const GridCard: FunctionComponent<PokemonCardInterface> = (props) => {
@@ -23,12 +24,7 @@ const GridCard: FunctionComponent<PokemonCardInterface> = (props) => {
           <h2 className={`mb-2`}>{name}</h2>
           <div className="flex gap-2 text-white">
             {types.map((type: string) => (
-              <span
-                key={`type-${type}`}
-                className={`text-xs rounded-lg py-1 px-4 bg--${type}`}
-              >
-                {type}
-              </span>
+              <TypeLabel key={`type-${type}`} type={type} />
             ))}
           </div>
         </div>
