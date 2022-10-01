@@ -6,6 +6,9 @@ import {
   PokemonListResponseInterface,
 } from "interfaces/pokemon"
 import { getFromStorage, setToStorage } from "@helpers/localStorage"
+import getListQuery from "query/list"
+import getGenerationQuery from "query/generation"
+import getFilterQuery from "query/type"
 
 const cache = setupCache({
   maxAge: 15 * 60 * 1000,
@@ -23,34 +26,18 @@ const api = axios.create({
 export const getPokemonsList = async (data: {
   limit: number
   offset: number
+  type?: string[] | undefined
+  generation?: string[] | undefined
 }): Promise<PokemonListResponseInterface> => {
-  const { limit, offset } = data
+  const { limit, offset, type, generation } = data
 
   const graphql = JSON.stringify({
-    query: `query getPokemons {
-      species: pokemon_v2_pokemonspecies(
-        limit: ${limit}
-        offset: ${offset}
-        order_by: {id: asc}
-      ) {
-        id
-        name
-        pokemons: pokemon_v2_pokemons {
-          id
-          types: pokemon_v2_pokemontypes {
-            type: pokemon_v2_type {
-              name
-            }
-          }
-        }
-      }
-
-      species_aggregate: pokemon_v2_pokemonspecies_aggregate {
-        aggregate {
-          count
-        }
-      }
-    }`,
+    query: getListQuery({
+      limit,
+      offset,
+      type,
+      generation,
+    }),
   })
 
   return await api({
@@ -94,12 +81,7 @@ export const getPokemonTypesList = async (): Promise<ResponseInterface> => {
     return JSON.parse(getFromStorage("pokemonTypes"))
 
   const graphql = JSON.stringify({
-    query: `query getPokemons {
-      pokemon_v2_type {
-        id
-        name
-      }
-    }`,
+    query: getFilterQuery,
   })
 
   return await api({
@@ -138,12 +120,7 @@ export const getPokemonGenerationsList =
       return JSON.parse(getFromStorage("pokemonGenerations"))
 
     const graphql = JSON.stringify({
-      query: `query getPokemons {
-      pokemon_v2_generation {
-        id
-        name
-      }
-    }`,
+      query: getGenerationQuery,
     })
 
     return await api({
