@@ -126,7 +126,7 @@ const Home: NextPage = () => {
               alt="Pokedex"
             />
           </figure>
-          <div className="text-2xl pb-4 flex gap-4 justify-between">
+          <div className="text-lg sm:text-2xl pb-4 flex gap-4 justify-between">
             <div>{totalPokemons} Pokemon(s)</div>
             <div className="flex gap-4">
               <button type="button">Compare</button>
