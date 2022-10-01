@@ -3,7 +3,7 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import { useRef, useEffect, useState } from "react"
 import { FilterOutlined } from "@ant-design/icons"
-import AppContext from "../context/AppContext"
+import AppContext from "context/AppContext"
 import GridCard from "@components/GridCard"
 import SkeletonCard from "@components/SkeletonCard"
 import { isMobile } from "react-device-detect"
@@ -33,6 +33,7 @@ const Home: NextPage = () => {
   const [comparePokemons, setComparePokemons] = useState<
     PokemonCardInterface[]
   >([])
+  const [queryString, setQueryString] = useState<string[]>([])
   const [stopObserver, setStopObserver] = useState<boolean>(false)
 
   /**
@@ -76,6 +77,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     loadNextPokemons()
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     observer = new IntersectionObserver((entries) => {
       const entry = entries[0]
       if (entry.isIntersecting && stopObserver === false) {
@@ -94,20 +96,30 @@ const Home: NextPage = () => {
     if (showLoading === true) {
       loadNextPokemons()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showLoading])
 
+  /**
+   * Display footer if type filter length is over 0
+   */
   useEffect(() => {
     if (typeFilter.length > 0) {
       setShowFooter(true)
     }
   }, [typeFilter])
 
+  /**
+   * Display footer if generation filter length is over 0
+   */
   useEffect(() => {
     if (generationFilter.length > 0) {
       setShowFooter(true)
     }
   }, [generationFilter])
 
+  /**
+   * Display footer if comparison length is over 0
+   */
   useEffect(() => {
     if (comparePokemons.length > 0) {
       setShowFooter(true)
@@ -117,9 +129,6 @@ const Home: NextPage = () => {
   return (
     <AppContext.Provider
       value={{
-        comparePokemons,
-        setComparePokemons,
-
         showSidebar,
         setShowSidebar,
 
@@ -130,6 +139,36 @@ const Home: NextPage = () => {
         setGenerationFilter,
 
         showCompare,
+        comparePokemons,
+        queryString,
+        changeComparisonData: (data: {
+          id: number
+          name: string
+          types: string[]
+          isChecked: boolean
+        }) => {
+          const { id, name, types, isChecked } = data
+          let comparePokemonsArray = [...comparePokemons]
+
+          if (isChecked) {
+            comparePokemonsArray.unshift({ id, name, types })
+          } else {
+            comparePokemonsArray = comparePokemonsArray.filter(
+              (pokemon) => pokemon.id !== id
+            )
+          }
+          queryString.length = 0
+          comparePokemonsArray.forEach((pokemon: any) => {
+            queryString.push(`id[]=${pokemon.id}`)
+          })
+
+          setComparePokemons(comparePokemonsArray)
+          setQueryString(queryString)
+
+          if (comparePokemonsArray.length > 0) {
+            setShowFooter(true)
+          }
+        },
 
         doFilterPokemon: () => {
           setPokemons([])
@@ -153,7 +192,12 @@ const Home: NextPage = () => {
           <div className="text-lg sm:text-2xl pb-4 flex gap-4 justify-between">
             <div>{totalPokemons} Pokemon(s)</div>
             <div className="flex gap-4">
-              <button type="button">Compare</button>
+              <button
+                type="button"
+                onClick={() => setShowCompare(!showCompare)}
+              >
+                Compare
+              </button>
               <button type="button" onClick={() => setShowSidebar(true)}>
                 Filter{" "}
                 <FilterOutlined className="float-right mt-[4px] ml-[4px]" />
