@@ -2,9 +2,9 @@ import { NextPage } from "next/types"
 import { Tabs } from "antd"
 import Link from "next/link"
 import Image from "next/image"
+import SinglePokemonAboutSection from "@components/SinglePokemon/About"
 import TypeLabel from "@components/Type"
 import PokemonStat from "@components/Stats"
-import DataDisplay from "@components/Data"
 import { getSinglePokemon } from "@helpers/pokeapi"
 
 interface SinglePokemonPageInterface {
@@ -13,20 +13,16 @@ interface SinglePokemonPageInterface {
 }
 
 const SinglePokemonPage: NextPage<SinglePokemonPageInterface> = (props) => {
-  console.log("props", props)
-  const {
-    pokemon: { name, description, id, pokemons },
-    success,
-  } = props
+  const { pokemon } = props
 
-  const { weight, types, stats, height, abilities } = pokemons[0]
+  const { types, stats, abilities } = pokemon.pokemons[0]
 
   return (
     <main className="sm:w-[480px] p-0 mx-auto">
       <header className={`bg-light--${types[0].type.name} p-4`}>
         <Link href="/">&lt; Back</Link>
         <h1 className="text-2xl font-bold text-gray-800 p-0 mb-4">
-          {name} #{id}
+          {pokemon.name} #{pokemon.id}
         </h1>
         <div className="flex gap-4">
           {types.map((type: any, index: number) => (
@@ -35,19 +31,17 @@ const SinglePokemonPage: NextPage<SinglePokemonPageInterface> = (props) => {
         </div>
         <figure className="w-[360px] mx-auto text-center">
           <Image
-            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`}
+            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`}
             width={360}
             height={360}
-            alt={name}
+            alt={pokemon.name}
           />
         </figure>
       </header>
       <section>
         <Tabs>
           <Tabs.TabPane tab="About" key="1">
-            <p>{description[0].flavor_text}</p>
-            <DataDisplay label="Height" content={`${height} m`} />
-            <DataDisplay label="Weight" content={`${weight} kg`} />
+            <SinglePokemonAboutSection pokemon={pokemon} />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Base Stats" key="2">
             {stats.map((stat: any, index: number) => (

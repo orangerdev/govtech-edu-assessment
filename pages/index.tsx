@@ -159,7 +159,7 @@ const Home: NextPage = () => {
           }
           queryString.length = 0
           comparePokemonsArray.forEach((pokemon: any) => {
-            queryString.push(`id[]=${pokemon.id}`)
+            queryString.push(`name[]=${pokemon.name}`)
           })
 
           setComparePokemons(comparePokemonsArray)

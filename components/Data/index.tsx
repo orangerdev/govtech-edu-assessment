@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactComponentElement, ReactNode } from "react"
+import { FunctionComponent, ReactNode } from "react"
 
 interface DataDisplayInterface {
   label: string

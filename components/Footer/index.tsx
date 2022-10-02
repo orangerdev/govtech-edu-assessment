@@ -32,7 +32,6 @@ const Footer: FunctionComponent = () => {
           </>
         )}
       </div>
-      <div>contoh : {context.queryString.join("&")}</div>
       <div className="compare-container">
         {context.showCompare && context.comparePokemons.length > 0 && (
           <>
