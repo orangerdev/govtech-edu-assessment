@@ -10,6 +10,7 @@ import getListQuery from "query/list"
 import getGenerationQuery from "query/generation"
 import getFilterQuery from "query/type"
 import getSinglePokemonQuery from "@query/single"
+import getComparedPokemonsQuery from "@query/compare"
 
 const cache = setupCache({
   maxAge: 15 * 60 * 1000,
@@ -52,7 +53,9 @@ export const getPokemonsList = async (data: {
           return {
             id: species.id,
             name: species.name,
-            types: species.pokemons[0].types.map((type: any) => type.type.name),
+            types: species.pokemons[0].types.map(
+              (_type: any) => _type.type.name
+            ),
           }
         })
       return {
@@ -177,6 +180,36 @@ export const getSinglePokemon = async (
 
       // Set to localStorage for future use
       setToStorage(localStorageKey, JSON.stringify(returnResponse))
+
+      return returnResponse
+    })
+    .catch((error) => {
+      return {
+        success: false,
+        data: null,
+        message: error,
+      }
+    })
+}
+
+export const getComparedPokemonsList = async (
+  names: any
+): Promise<ResponseInterface> => {
+  const graphql = JSON.stringify({
+    query: getComparedPokemonsQuery(names),
+  })
+
+  return await api({
+    method: "post",
+    url: "https://beta.pokeapi.co/graphql/v1beta",
+    data: graphql,
+  })
+    .then((response) => {
+      const returnResponse = {
+        success: true,
+        data: response.data?.data,
+        message: `Compared pokemons fetched successfully`,
+      }
 
       return returnResponse
     })
