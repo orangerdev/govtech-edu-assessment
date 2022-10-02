@@ -3,14 +3,16 @@ import { Wrapper } from "./index.style"
 
 interface TypeLabelInterface {
   type: string
+  background?: string
 }
 
 const TypeLabel: FunctionComponent<TypeLabelInterface> = (props) => {
-  const { type } = props
-
+  const { type, background } = props
   return (
     <Wrapper
-      className={`inline-block text-xs rounded-lg py-1 px-4 bg--${type} white`}
+      className={`inline-block text-xs rounded-lg py-1 px-4 bg--${
+        background === undefined ? type : background
+      } white`}
     >
       {type}
     </Wrapper>

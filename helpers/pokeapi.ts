@@ -9,6 +9,7 @@ import { getFromStorage, setToStorage } from "@helpers/localStorage"
 import getListQuery from "query/list"
 import getGenerationQuery from "query/generation"
 import getFilterQuery from "query/type"
+import getSinglePokemonQuery from "@query/single"
 
 const cache = setupCache({
   maxAge: 15 * 60 * 1000,
@@ -148,3 +149,42 @@ export const getPokemonGenerationsList =
         }
       })
   }
+
+export const getSinglePokemon = async (
+  name: string
+): Promise<ResponseInterface> => {
+  // Check from localStorage first
+  const localStorageKey = `pokemnon-${name}`
+
+  if (getFromStorage(localStorageKey))
+    return JSON.parse(getFromStorage(localStorageKey))
+
+  const graphql = JSON.stringify({
+    query: getSinglePokemonQuery(name),
+  })
+
+  return await api({
+    method: "post",
+    url: "https://beta.pokeapi.co/graphql/v1beta",
+    data: graphql,
+  })
+    .then((response) => {
+      const returnResponse = {
+        success: true,
+        data: response.data?.data?.species[0],
+        message: `Pokemon ${name} fetched successfully`,
+      }
+
+      // Set to localStorage for future use
+      setToStorage(localStorageKey, JSON.stringify(returnResponse))
+
+      return returnResponse
+    })
+    .catch((error) => {
+      return {
+        success: false,
+        data: null,
+        message: error,
+      }
+    })
+}
